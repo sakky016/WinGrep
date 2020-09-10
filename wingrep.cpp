@@ -212,13 +212,12 @@ static bool SearchLine(const string& line, const GrepOptions_t& options)
 static void DisplaySearchResult(const string& file, const string& line, int lineNumber, const GrepOptions_t& options)
 {
     g_mtx.lock();
-    std::cout << file << ": " << line;
+    std::cout << file;
     if (options.bShowLineNumbers)
     {
-        cout << ": " << lineNumber;
+        cout << ":" << lineNumber;
     }
-
-    cout << endl;
+    std::cout << "  " << line << endl;
     g_mtx.unlock();
 }
 
