@@ -18,10 +18,13 @@ static void Usage()
     cout << "Usage:\n";
     cout << "WinGrep.exe [options] <path> <search_string>\n";
     cout << "Options:\n";
-    cout << "  -r  : Recursive search\n";
-    cout << "  -i  : Case insensitive search\n";
-    cout << "  -n  : Show line numbers in search result\n";
-    cout << "  -w  : Match whole word\n";
+    cout << "  -r        : Recursive search\n";
+    cout << "  -i        : Case insensitive search\n";
+    cout << "  -n        : Show line numbers in search result\n";
+    cout << "  -w        : Match whole word\n";
+    cout << "  -j <num>  : Uses <num> number of worker threads to search.\n"
+            "              If nothing or an invalid value is specified then hardware_concurrency\n"
+            "              is used to determine number of worker threads\n";
     cout << "\n";
 }
 
@@ -70,6 +73,26 @@ static bool ProcessCommandLineArguments(int argc, char* argv[], GrepOptions_t & 
                 {
                     options.bMatchWholeWord = true;
                 }
+                else if (param[j] == 'j')
+                {
+                    nextParamIndex++;
+                    string threadsStr(argv[nextParamIndex]);
+                    if (threadsStr.empty())
+                    {
+                        bValidArguments = false;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            options.threadsToUse = stoi(threadsStr);
+                        }
+                        catch (invalid_argument er)
+                        {
+                            options.threadsToUse = 0;
+                        }
+                    }
+                }
             }
 
             nextParamIndex++;
@@ -112,21 +135,12 @@ int main(int argc, char* argv[])
         return 0;
     }
     
-    long long results = 0;
-    if (filesystem::exists(options.searchPath))
-    {
-        vector<string> filesToSearch = GetFilesToSearch(options);
-        for (const auto& file : filesToSearch)
-        {
-            results += ProcessFile(file, options);
-        }
+    //cout << "Search Path: " << options.searchPath << endl;
+    //cout << "Search String: " << options.searchString << endl;
 
-        cout << " Found " << results << " result(s)\n";
-    }
-    else
-    {
-        cout << "Invalid search path : " << options.searchPath << endl;
-    }
+    long long results = 0;
+    results = GetSearchResults(options);
+    cout << " Found " << results << " result(s)\n";
 
 
     return 0;

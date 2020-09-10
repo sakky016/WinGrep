@@ -11,9 +11,9 @@ typedef struct GrepOptions_tag
     bool bCaseInsensitive;
     bool bShowLineNumbers;
     bool bMatchWholeWord;
+    int threadsToUse;
     std::string searchPath;
     std::string searchString;
 }GrepOptions_t;
 
-vector<string> GetFilesToSearch(const GrepOptions_t & options);
-long long ProcessFile(const string& file, const GrepOptions_t& options);
+long long GetSearchResults(const GrepOptions_t& options);
